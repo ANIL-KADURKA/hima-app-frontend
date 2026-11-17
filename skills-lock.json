@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "expo-rn-clean-code": {
+      "source": "USHASRI1112/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/expo-rn-clean-code/SKILL.md",
+      "computedHash": "b65c0f9db3b86c6329da98a40dbf357818f0c005e63b65df16264bcc1e82736f"
+    }
+  }
+}
