@@ -53,6 +53,7 @@ assets/               # Images, fonts, icons
 ```
 
 Rules:
+
 - Keep `app/` focused on Expo Router navigation and route composition.
 - Keep business logic inside feature modules.
 - Keep reusable UI inside shared components.
@@ -74,6 +75,7 @@ Rules:
 ## 5. Components, Hooks & TypeScript
 
 ### Components
+
 - Components must have a clear responsibility.
 - Keep UI components focused on rendering and user interactions.
 - Extract reusable UI patterns.
@@ -82,6 +84,7 @@ Rules:
 - Handle loading, error, empty, and success states.
 
 ### Hooks
+
 - Extract reusable stateful logic into custom hooks.
 - Keep hooks focused on one responsibility.
 - Avoid unnecessary `useEffect`, `useMemo`, and `useCallback`.
@@ -89,6 +92,7 @@ Rules:
 - Do not create abstractions that add complexity without value.
 
 ### TypeScript
+
 - Use TypeScript throughout the application.
 - Avoid `any`; prefer explicit types and interfaces.
 - Type API requests, responses, component props, and navigation parameters.
