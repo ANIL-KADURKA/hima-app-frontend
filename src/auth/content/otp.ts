@@ -6,6 +6,7 @@ export const otpContent = {
   formatPhone: (phone: string) => `${phoneCountry.dialCode} ${phone.slice(0, 5)} ${phone.slice(5)}`,
   changeNumber: 'Change number',
   codeLabel: 'Verification code',
+  digitLabel: (digit: number, length: number) => `Verification code digit ${digit} of ${length}`,
   inputLabel: (length: number) => `${length}-digit verification code`,
   inputHint: 'Enter or paste the code from your text message',
   helper: 'You can paste the code from your SMS.',
