@@ -17,36 +17,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { registrationContent as content } from '@/auth/content/registration';
 import { phoneCountry, symbols } from '@/shared/content/common';
 
+import { Checkbox } from '@/shared/components/Checkbox';
 import { RegistrationHero } from '@/auth/components/RegistrationHero';
 
 import { theme } from '@/shared/theme';
 
 const { colors, spacing, radius, typography } = theme;
-
-function Checkbox({
-  checked,
-  label,
-  onPress,
-}: {
-  checked: boolean;
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="checkbox"
-      accessibilityLabel={label}
-      accessibilityState={{ checked }}
-      onPress={onPress}
-      hitSlop={8}
-      style={styles.checkboxTarget}
-    >
-      <View style={[styles.checkbox, checked && styles.checked]}>
-        {checked && <Text style={styles.checkmark}>{symbols.checkmark}</Text>}
-      </View>
-    </Pressable>
-  );
-}
 
 export function RegistrationScreen() {
   const router = useRouter();
@@ -119,14 +95,11 @@ export function RegistrationScreen() {
                 <Text style={styles.helper}>{content.phoneHelper}</Text>
               </View>
 
-              <View style={styles.referralRow}>
-                <Checkbox
-                  checked={hasReferral}
-                  label={content.referralToggle}
-                  onPress={() => setHasReferral(!hasReferral)}
-                />
-                <Text style={styles.referralLabel}>{content.referralToggle}</Text>
-              </View>
+              <Checkbox
+                checked={hasReferral}
+                label={content.referralToggle}
+                onChange={setHasReferral}
+              />
               {hasReferral && (
                 <TextInput
                   accessibilityLabel={content.referralLabel}
@@ -138,23 +111,18 @@ export function RegistrationScreen() {
                 />
               )}
 
-              <View style={styles.consentRow}>
-                <Checkbox
-                  checked={accepted}
-                  label={content.consentLabel}
-                  onPress={() => setAccepted(!accepted)}
-                />
-                <Text style={styles.consentText}>
-                  {content.consent.map((segment) => (
-                    <Text
-                      key={segment.text}
-                      style={segment.highlighted ? styles.policy : undefined}
-                    >
-                      {segment.text}
-                    </Text>
-                  ))}
-                </Text>
-              </View>
+              <Checkbox
+                checked={accepted}
+                label={content.consentLabel}
+                onChange={setAccepted}
+                labelStyle={styles.consentText}
+              >
+                {content.consent.map((segment) => (
+                  <Text key={segment.text} style={segment.highlighted ? styles.policy : undefined}>
+                    {segment.text}
+                  </Text>
+                ))}
+              </Checkbox>
               <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ disabled: !canContinue }}
@@ -247,35 +215,6 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: spacing.sm,
   },
-  referralRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing['xs'],
-  },
-  referralLabel: { ...typography.body, color: colors.text, flexShrink: 1 },
-  checkboxTarget: {
-    minHeight: 48,
-    minWidth: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkbox: {
-    width: 19,
-    height: 19,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    borderRadius: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checked: { backgroundColor: colors.primary },
-  checkmark: {
-    fontSize: 16,
-    lineHeight: 18,
-    color: colors.textOnPrimary,
-    fontWeight: '700',
-  },
   referralInput: {
     ...typography.body,
     borderWidth: 1,
@@ -285,12 +224,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.sm,
     color: colors.text,
-  },
-  consentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    marginBottom: spacing.sm,
   },
   consentText: { ...typography.caption, flex: 1, color: colors.textSecondary },
   policy: { color: colors.primaryDark },
