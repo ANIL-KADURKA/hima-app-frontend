@@ -34,6 +34,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   pressed: { backgroundColor: theme.colors.primaryDark },
-  disabled: { opacity: 0.5 },
+  disabled: {
+    backgroundColor: theme.colors.surfaceDisabled,
+  },
   label: { ...theme.typography.button, color: theme.colors.textOnPrimary },
 });
