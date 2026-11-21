@@ -1,6 +1,12 @@
 import { registrationContent as content } from '@/auth/content/registration';
 import type { RegistrationField, RegistrationValues } from '@/auth/types/registration';
 
+export const REGISTRATION_FIELD_TYPE = {
+  PHONE: 'phone',
+  TEXT: 'text',
+  CHECKBOX: 'checkbox',
+} as const;
+
 export const initialRegistrationValues: RegistrationValues = {
   phone: '',
   hasReferral: false,
@@ -11,7 +17,7 @@ export const initialRegistrationValues: RegistrationValues = {
 // JSON-compatible field definitions. Rendering and validation use the same schema.
 export const registrationFields = [
   {
-    type: 'phone',
+    type: REGISTRATION_FIELD_TYPE.PHONE,
     name: 'phone',
     label: content.phoneLabel,
     placeholder: content.phonePlaceholder,
@@ -25,9 +31,9 @@ export const registrationFields = [
       maxLength: 10,
     },
   },
-  { type: 'checkbox', name: 'hasReferral', label: content.referralToggle },
+  { type: REGISTRATION_FIELD_TYPE.CHECKBOX, name: 'hasReferral', label: content.referralToggle },
   {
-    type: 'text',
+    type: REGISTRATION_FIELD_TYPE.TEXT,
     name: 'referralCode',
     label: content.referralLabel,
     placeholder: content.referralPlaceholder,
@@ -35,7 +41,7 @@ export const registrationFields = [
     inputProps: { autoCapitalize: 'characters', autoCorrect: false },
   },
   {
-    type: 'checkbox',
+    type: REGISTRATION_FIELD_TYPE.CHECKBOX,
     name: 'accepted',
     label: content.consentLabel,
     required: true,

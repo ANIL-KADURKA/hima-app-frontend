@@ -1,3 +1,4 @@
+import { REGISTRATION_FIELD_TYPE } from '@/auth/config/registration';
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { RegistrationField, RegistrationValues } from '@/auth/types/registration';
@@ -19,7 +20,7 @@ export function RegistrationForm({ fields, values, onChange }: RegistrationFormP
       {fields
         .filter((field) => isFieldVisible(field, values))
         .map((field) => {
-          if (field.type === 'checkbox') {
+          if (field.type === REGISTRATION_FIELD_TYPE.CHECKBOX) {
             return (
               <Checkbox
                 key={field.name}
@@ -36,7 +37,7 @@ export function RegistrationForm({ fields, values, onChange }: RegistrationFormP
               </Checkbox>
             );
           }
-          const Input = field.type === 'phone' ? PhoneField : TextField;
+          const Input = field.type === REGISTRATION_FIELD_TYPE.PHONE ? PhoneField : TextField;
           return (
             <Input
               key={field.name}
@@ -48,7 +49,8 @@ export function RegistrationForm({ fields, values, onChange }: RegistrationFormP
               onChangeText={(text) =>
                 onChange({
                   ...values,
-                  [field.name]: field.type === 'phone' ? text.replace(/\D/g, '') : text,
+                  [field.name]:
+                    field.type === REGISTRATION_FIELD_TYPE.PHONE ? text.replace(/\D/g, '') : text,
                 })
               }
             />

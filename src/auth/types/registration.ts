@@ -1,3 +1,4 @@
+import type { REGISTRATION_FIELD_TYPE } from '@/auth/config/registration';
 import type { TextInputProps } from 'react-native';
 
 export type RegistrationValues = {
@@ -21,7 +22,7 @@ type FieldBase = {
 };
 
 type InputField = FieldBase & {
-  type: 'phone' | 'text';
+  type: typeof REGISTRATION_FIELD_TYPE.PHONE | typeof REGISTRATION_FIELD_TYPE.TEXT;
   name: TextFieldName;
   placeholder: string;
   helper?: string;
@@ -38,7 +39,7 @@ type InputField = FieldBase & {
 };
 
 type CheckboxField = FieldBase & {
-  type: 'checkbox';
+  type: typeof REGISTRATION_FIELD_TYPE.CHECKBOX;
   name: CheckboxName;
   segments?: readonly { text: string; highlighted: boolean }[];
 };
