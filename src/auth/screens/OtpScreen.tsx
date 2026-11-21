@@ -1,23 +1,13 @@
 import { useState } from 'react';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Keyboard, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { OtpInput } from '@/auth/components/OtpInput';
 import { RegistrationHero } from '@/auth/components/RegistrationHero';
 import { DEMO_OTP, OTP_LENGTH } from '@/auth/constants/auth';
 import { otpContent as content } from '@/auth/content/otp';
 import { useResendCountdown } from '@/auth/hooks/useResendCountdown';
+import { Screen } from '@/shared/components/Screen';
 import { Button } from '@/shared/components/Button';
 import { colors, spacing, typography } from '@/shared/theme';
 
@@ -60,92 +50,67 @@ export function OtpScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom', 'left', 'right']}>
-      <KeyboardAvoidingView
-        style={styles.fill}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.scrollContent}
-        >
-          <View style={[styles.page, { width: contentWidth }]}>
-            <RegistrationHero width={contentWidth} />
-            <View style={styles.form}>
-              <Text accessibilityRole="header" style={styles.title}>
-                {content.title}
-              </Text>
-              <Text style={styles.subtitle}>{content.subtitle(OTP_LENGTH)}</Text>
-              <View style={styles.numberRow}>
-                <Text style={styles.phone}>{content.formatPhone(phone)}</Text>
-                <Pressable
-                  accessibilityRole="button"
-                  onPress={changeNumber}
-                  style={styles.textButton}
-                >
-                  <Text style={styles.link}>{content.changeNumber}</Text>
-                </Pressable>
-              </View>
+    <Screen
+      variant="full"
+      maxWidth={480}
+      backgroundColor={colors.background}
+      edges={['top', 'bottom', 'left', 'right']}
+    >
+      <RegistrationHero width={contentWidth} />
+      <View style={styles.form}>
+        <Text accessibilityRole="header" style={styles.title}>
+          {content.title}
+        </Text>
+        <Text style={styles.subtitle}>{content.subtitle(OTP_LENGTH)}</Text>
+        <View style={styles.numberRow}>
+          <Text style={styles.phone}>{content.formatPhone(phone)}</Text>
+          <Pressable accessibilityRole="button" onPress={changeNumber} style={styles.textButton}>
+            <Text style={styles.link}>{content.changeNumber}</Text>
+          </Pressable>
+        </View>
 
-              <Text style={styles.label}>{content.codeLabel}</Text>
-              <OtpInput
-                value={code}
-                onChange={(value) => {
-                  setCode(value);
-                  setMessage('');
-                }}
-              />
-              <Text style={styles.helper}>{content.helper}</Text>
+        <Text style={styles.label}>{content.codeLabel}</Text>
+        <OtpInput
+          value={code}
+          onChange={(value) => {
+            setCode(value);
+            setMessage('');
+          }}
+        />
+        <Text style={styles.helper}>{content.helper}</Text>
 
-              <View style={styles.resendRow}>
-                <Text style={styles.resendHint}>{content.resendHint}</Text>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={
-                    secondsRemaining > 0
-                      ? content.resendCountdownLabel(secondsRemaining)
-                      : content.resendLabel
-                  }
-                  accessibilityState={{ disabled: secondsRemaining > 0 }}
-                  disabled={secondsRemaining > 0}
-                  onPress={resendCode}
-                  style={styles.textButton}
-                >
-                  <Text style={[styles.link, secondsRemaining > 0 && styles.muted]}>
-                    {secondsRemaining > 0
-                      ? content.resendCountdown(secondsRemaining)
-                      : content.resend}
-                  </Text>
-                </Pressable>
-              </View>
-              {message !== '' && (
-                <Text
-                  accessibilityRole="alert"
-                  accessibilityLiveRegion="polite"
-                  style={styles.message}
-                >
-                  {message}
-                </Text>
-              )}
-              <Button
-                label={content.submit}
-                disabled={code.length !== OTP_LENGTH}
-                onPress={verifyCode}
-              />
-              <Text style={styles.footer}>{content.footer}</Text>
-            </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        <View style={styles.resendRow}>
+          <Text style={styles.resendHint}>{content.resendHint}</Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={
+              secondsRemaining > 0
+                ? content.resendCountdownLabel(secondsRemaining)
+                : content.resendLabel
+            }
+            accessibilityState={{ disabled: secondsRemaining > 0 }}
+            disabled={secondsRemaining > 0}
+            onPress={resendCode}
+            style={styles.textButton}
+          >
+            <Text style={[styles.link, secondsRemaining > 0 && styles.muted]}>
+              {secondsRemaining > 0 ? content.resendCountdown(secondsRemaining) : content.resend}
+            </Text>
+          </Pressable>
+        </View>
+        {message !== '' && (
+          <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.message}>
+            {message}
+          </Text>
+        )}
+        <Button label={content.submit} disabled={code.length !== OTP_LENGTH} onPress={verifyCode} />
+        <Text style={styles.footer}>{content.footer}</Text>
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  fill: { flex: 1 },
-  safeArea: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { flexGrow: 1, alignItems: 'center' },
-  page: { flexGrow: 1 },
   form: {
     paddingHorizontal: spacing['2xl'],
     paddingTop: spacing['lg'],
