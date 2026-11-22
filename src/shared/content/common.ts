@@ -1,3 +1,5 @@
+import { i18n } from '@/shared/i18n';
+
 export const brandContent = {
   name: 'Hima',
   tagline: 'Where Feelings Connect',
@@ -6,7 +8,7 @@ export const brandContent = {
 export const symbols = { checkmark: '✓', close: '×', sparkle: '✦' } as const;
 
 export const phoneCountry = {
-  name: 'India',
+  name: i18n.t('common.country.india'),
   flag: '🇮🇳',
   dialCode: '+91',
 } as const;
