@@ -1,24 +1,50 @@
-import { Pressable, StyleSheet, Text, type PressableProps } from 'react-native';
+import { Pressable, StyleSheet, Text, View, type PressableProps } from 'react-native';
+import type { ReactNode } from 'react';
 
 import { theme } from '@/shared/theme';
 
-type ButtonProps = Omit<PressableProps, 'children'> & { label: string };
+type ButtonProps = Omit<PressableProps, 'children'> & {
+  label: string;
+  variant?: 'primary' | 'outline';
+  isLoading?: boolean;
+  loadingLabel?: string;
+  leadingContent?: ReactNode;
+};
 
-export function Button({ label, disabled, style, ...props }: ButtonProps) {
+export function Button({
+  label,
+  variant = 'primary',
+  isLoading = false,
+  loadingLabel,
+  leadingContent,
+  disabled,
+  style,
+  ...props
+}: ButtonProps) {
+  const isDisabled = disabled || isLoading;
+
   return (
     <Pressable
       {...props}
       accessibilityRole="button"
-      accessibilityState={{ disabled: Boolean(disabled) }}
-      disabled={disabled}
+      accessibilityState={{ disabled: Boolean(isDisabled), busy: isLoading }}
+      disabled={isDisabled}
       style={(state) => [
         styles.button,
-        state.pressed && styles.pressed,
-        disabled && styles.disabled,
+        variant === 'outline' && styles.outline,
+        state.pressed && (variant === 'outline' ? styles.outlinePressed : styles.pressed),
+        isDisabled && (variant === 'outline' ? styles.outlineDisabled : styles.disabled),
         typeof style === 'function' ? style(state) : style,
       ]}
     >
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.content}>
+        {leadingContent !== undefined && (
+          <View style={styles.leadingContent}>{leadingContent}</View>
+        )}
+        <Text style={[styles.label, variant === 'outline' && styles.outlineLabel]}>
+          {isLoading ? (loadingLabel ?? label) : label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -37,5 +63,21 @@ const styles = StyleSheet.create({
   disabled: {
     backgroundColor: theme.colors.surfaceDisabled,
   },
+  outline: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  outlinePressed: { backgroundColor: theme.colors.primaryLight },
+  outlineDisabled: { opacity: 0.65 },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  leadingContent: {
+    marginRight: theme.spacing.sm,
+  },
   label: { ...theme.typography.button, color: theme.colors.textOnPrimary },
+  outlineLabel: { color: theme.colors.text },
 });

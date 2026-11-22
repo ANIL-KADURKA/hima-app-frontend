@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import type { RegistrationField, RegistrationValues } from '@/auth/types/registration';
 import { isFieldVisible } from '@/auth/utils/registration';
+import { logAuthDebug } from '@/auth/utils/authDebug';
 import { Checkbox } from '@/shared/components/Checkbox';
 import { PhoneField } from '@/shared/components/PhoneField';
 import { TextField } from '@/shared/components/TextField';
@@ -26,7 +27,13 @@ export function RegistrationForm({ fields, values, onChange }: RegistrationFormP
                 key={field.name}
                 label={field.label}
                 checked={values[field.name]}
-                onChange={(checked) => onChange({ ...values, [field.name]: checked })}
+                onChange={(checked) => {
+                  logAuthDebug('registration.field_changed', {
+                    field: field.name,
+                    checked,
+                  });
+                  onChange({ ...values, [field.name]: checked });
+                }}
                 labelStyle={field.segments ? styles.consent : undefined}
               >
                 {field.segments?.map((segment) => (
@@ -46,13 +53,21 @@ export function RegistrationForm({ fields, values, onChange }: RegistrationFormP
               placeholder={field.placeholder}
               helper={field.helper}
               value={values[field.name]}
-              onChangeText={(text) =>
+              onChangeText={(text) => {
+                const nextValue =
+                  field.type === REGISTRATION_FIELD_TYPE.PHONE ? text.replace(/\D/g, '') : text;
+                logAuthDebug('registration.field_changed', {
+                  field: field.name,
+                  valueLength: nextValue.length,
+                  ...(field.type === REGISTRATION_FIELD_TYPE.PHONE
+                    ? { validFormat: /^\d{10}$/.test(nextValue) }
+                    : {}),
+                });
                 onChange({
                   ...values,
-                  [field.name]:
-                    field.type === REGISTRATION_FIELD_TYPE.PHONE ? text.replace(/\D/g, '') : text,
-                })
-              }
+                  [field.name]: nextValue,
+                });
+              }}
             />
           );
         })}
