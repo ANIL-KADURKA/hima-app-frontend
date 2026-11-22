@@ -1,4 +1,5 @@
 import { registrationContent as content } from '@/auth/content/registration';
+import { PHONE_NUMBER_PATTERN } from '@/auth/constants/auth';
 import type { RegistrationField, RegistrationValues } from '@/auth/types/registration';
 
 export const REGISTRATION_FIELD_TYPE = {
@@ -23,7 +24,7 @@ export const registrationFields = [
     placeholder: content.phonePlaceholder,
     helper: content.phoneHelper,
     required: true,
-    pattern: '^\\d{10}$',
+    pattern: PHONE_NUMBER_PATTERN.source,
     inputProps: {
       keyboardType: 'phone-pad',
       autoComplete: 'tel-national',

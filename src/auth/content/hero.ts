@@ -1,4 +1,5 @@
 import { colors } from '@/shared/theme';
+import { i18n } from '@/shared/i18n';
 
 export type HeroIconName = 'chat' | 'video' | 'voice' | 'heart' | 'star' | 'infinity';
 
@@ -18,10 +19,10 @@ type Decoration = {
 };
 
 export const heroFeatures: readonly HeroFeature[] = [
-  { icon: 'chat', label: 'Chat', colors: ['#FF99D6', colors.primary] },
-  { icon: 'video', label: 'Video', colors: ['#9BC9FF', '#287BEE'] },
-  { icon: 'voice', label: 'Voice', colors: ['#6CF0BC', '#00C58B'] },
-  { icon: 'heart', label: 'Connect', colors: ['#D7AEFF', '#914AFF'] },
+  { icon: 'chat', label: i18n.t('auth.hero.chat'), colors: ['#FF99D6', colors.primary] },
+  { icon: 'video', label: i18n.t('auth.hero.video'), colors: ['#9BC9FF', '#287BEE'] },
+  { icon: 'voice', label: i18n.t('auth.hero.voice'), colors: ['#6CF0BC', '#00C58B'] },
+  { icon: 'heart', label: i18n.t('auth.hero.connect'), colors: ['#D7AEFF', '#914AFF'] },
 ];
 
 export const heroDecorations: readonly Decoration[] = [
