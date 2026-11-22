@@ -34,6 +34,9 @@ const englishMessages = {
   'auth.registration.phoneLabel': 'Mobile number',
   'auth.registration.phonePlaceholder': 'Enter mobile number',
   'auth.registration.phoneHelper': 'You will receive an OTP on this number.',
+  'auth.registration.phoneHintInvalid':
+    'The suggested phone number is not valid. Please enter it manually.',
+  'auth.registration.consentRequired': 'Please accept the terms and conditions to continue.',
   'auth.registration.referralToggle': 'Have a referral code?',
   'auth.registration.referralLabel': 'Referral code',
   'auth.registration.referralPlaceholder': 'Enter referral code',
