@@ -7,6 +7,7 @@ import { RegistrationHero } from '@/auth/components/RegistrationHero';
 import { initialRegistrationValues, registrationFields } from '@/auth/config/registration';
 import { registrationContent as content } from '@/auth/content/registration';
 import { isRegistrationValid } from '@/auth/utils/registration';
+import { normalizePhoneNumberHint } from '@/auth/utils/normalizePhoneNumberHint';
 import { getAuthErrorMessage } from '@/auth/utils/authErrorMessage';
 import { logAuthDebug, logAuthWarning } from '@/auth/utils/authDebug';
 import { useAuthSession } from '@/auth/hooks/useAuthSession';
@@ -28,35 +29,23 @@ export function RegistrationScreen() {
   const contentWidth = Math.min(width, 480);
   const [values, setValues] = useState(initialRegistrationValues);
   const [showNotice, setShowNotice] = useState(true);
+  const [phoneHintError, setPhoneHintError] = useState('');
   const canContinue = isRegistrationValid(registrationFields, values);
 
   if (isSessionPending) return <LoadingIndicator />;
   if (session) return <Redirect href={APP_ROUTES.client} />;
 
-  function continueToOtp() {
-    logAuthDebug('registration.submit_pressed', {
-      formValid: canContinue,
-      phoneLength: values.phone.length,
-      referralEnabled: values.hasReferral,
-      referralCodeLength: values.referralCode.length,
-      accepted: values.accepted,
-      requestPending: requestPhoneCode.isPending,
-    });
-    if (!canContinue || requestPhoneCode.isPending) {
-      logAuthDebug('registration.submit_blocked', {
-        reason: requestPhoneCode.isPending ? 'request_pending' : 'form_invalid',
-      });
-      return;
-    }
+  function sendPhoneCode(e164PhoneNumber: string, otpPhone: string, isE164: boolean) {
     Keyboard.dismiss();
     requestPhoneCode.reset();
-    requestPhoneCode.mutate(`${phoneCountry.dialCode}${values.phone}`, {
+    requestPhoneCode.mutate(e164PhoneNumber, {
       onSuccess: () => {
         logAuthDebug('registration.navigation_to_otp');
         router.push({
           pathname: APP_ROUTES.otp,
           params: {
-            phone: values.phone,
+            phone: otpPhone,
+            ...(isE164 ? { e164: 'true' } : {}),
             ...(values.hasReferral && values.referralCode.trim()
               ? { referralCode: values.referralCode.trim() }
               : {}),
@@ -67,13 +56,64 @@ export function RegistrationScreen() {
     });
   }
 
-  const message = googleSignIn.error
-    ? getAuthErrorMessage(googleSignIn.error)
-    : requestPhoneCode.error
-      ? getAuthErrorMessage(requestPhoneCode.error)
-      : sessionError
-        ? getAuthErrorMessage(sessionError)
-        : '';
+  function continueToOtp() {
+    const formValid = isRegistrationValid(registrationFields, values);
+    logAuthDebug('registration.submit_pressed', {
+      source: 'form',
+      formValid,
+      phoneLength: values.phone.length,
+      referralEnabled: values.hasReferral,
+      referralCodeLength: values.referralCode.length,
+      accepted: values.accepted,
+      requestPending: requestPhoneCode.isPending,
+    });
+    if (!formValid || requestPhoneCode.isPending || googleSignIn.isPending) {
+      logAuthDebug('registration.submit_blocked', {
+        reason:
+          requestPhoneCode.isPending || googleSignIn.isPending ? 'request_pending' : 'form_invalid',
+      });
+      return;
+    }
+    setPhoneHintError('');
+    sendPhoneCode(`${phoneCountry.dialCode}${values.phone}`, values.phone, false);
+  }
+
+  function handlePhoneHintSelected(hint: string) {
+    const e164PhoneNumber = normalizePhoneNumberHint(hint, phoneCountry.dialCode, 10);
+    if (e164PhoneNumber === null) {
+      logAuthDebug('registration.phone_hint_ignored', {
+        phoneLength: hint.replace(/\D/g, '').length,
+      });
+      setPhoneHintError(content.phoneHintInvalid);
+      return;
+    }
+
+    if (!values.accepted) {
+      setPhoneHintError(content.consentRequired);
+      return;
+    }
+
+    if (requestPhoneCode.isPending || googleSignIn.isPending) {
+      logAuthDebug('registration.phone_hint_submit_blocked', { reason: 'request_pending' });
+      return;
+    }
+
+    setPhoneHintError('');
+    logAuthDebug('registration.phone_hint_selected', {
+      phoneLength: e164PhoneNumber.length - 1,
+    });
+    sendPhoneCode(e164PhoneNumber, e164PhoneNumber.slice(1), true);
+  }
+
+  const message =
+    phoneHintError ||
+    (googleSignIn.error
+      ? getAuthErrorMessage(googleSignIn.error)
+      : requestPhoneCode.error
+        ? getAuthErrorMessage(requestPhoneCode.error)
+        : sessionError
+          ? getAuthErrorMessage(sessionError)
+          : '');
   const isSendingCode = requestPhoneCode.isPending;
 
   return (
@@ -109,7 +149,15 @@ export function RegistrationScreen() {
           {content.title}
         </Text>
         <Text style={styles.subtitle}>{content.subtitle}</Text>
-        <RegistrationForm fields={registrationFields} values={values} onChange={setValues} />
+        <RegistrationForm
+          fields={registrationFields}
+          values={values}
+          onChange={(nextValues) => {
+            setValues(nextValues);
+            setPhoneHintError('');
+          }}
+          onPhoneHintSelected={handlePhoneHintSelected}
+        />
         {message !== '' && (
           <Text accessibilityRole="alert" style={styles.message}>
             {message}

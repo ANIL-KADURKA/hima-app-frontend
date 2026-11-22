@@ -5,7 +5,7 @@ import { Keyboard, Pressable, StyleSheet, Text, View, useWindowDimensions } from
 import { APP_ROUTES } from '@/routes';
 import { OtpInput } from '@/auth/components/OtpInput';
 import { RegistrationHero } from '@/auth/components/RegistrationHero';
-import { OTP_LENGTH, PHONE_NUMBER_PATTERN } from '@/auth/constants/auth';
+import { E164_PHONE_NUMBER_PATTERN, OTP_LENGTH, PHONE_NUMBER_PATTERN } from '@/auth/constants/auth';
 import { otpContent as content } from '@/auth/content/otp';
 import { useResendCountdown } from '@/auth/hooks/useResendCountdown';
 import { useAuthSession } from '@/auth/hooks/useAuthSession';
@@ -26,8 +26,13 @@ export function OtpScreen() {
   const clearPhoneVerification = useAuthStore((state) => state.clearVerification);
   const requestPhoneCode = useRequestPhoneCode();
   const verifyPhoneCode = useVerifyPhoneCode();
-  const params = useLocalSearchParams<{ phone?: string | string[] }>();
+  const params = useLocalSearchParams<{ phone?: string | string[]; e164?: string | string[] }>();
   const phone = typeof params.phone === 'string' ? params.phone : '';
+  const isE164Phone = params.e164 === 'true';
+  const e164PhoneNumber = isE164Phone ? `+${phone}` : `${phoneCountry.dialCode}${phone}`;
+  const isPhoneValid = isE164Phone
+    ? E164_PHONE_NUMBER_PATTERN.test(e164PhoneNumber)
+    : PHONE_NUMBER_PATTERN.test(phone);
   const { width } = useWindowDimensions();
   const contentWidth = Math.min(width, 480);
   const [code, setCode] = useState('');
@@ -35,7 +40,7 @@ export function OtpScreen() {
 
   if (isSessionPending) return <LoadingIndicator />;
   if (session) return <Redirect href={APP_ROUTES.client} />;
-  if (!PHONE_NUMBER_PATTERN.test(phone) || !verificationReady) {
+  if (!isPhoneValid || !verificationReady) {
     return <Redirect href={APP_ROUTES.register} />;
   }
 
@@ -61,7 +66,7 @@ export function OtpScreen() {
     setCode('');
     requestPhoneCode.reset();
     verifyPhoneCode.reset();
-    requestPhoneCode.mutate(`${phoneCountry.dialCode}${phone}`, {
+    requestPhoneCode.mutate(e164PhoneNumber, {
       onSuccess: restart,
       onError: (error) => logAuthWarning('otp.resend_failed', error),
     });
@@ -109,7 +114,9 @@ export function OtpScreen() {
         </Text>
         <Text style={styles.subtitle}>{content.subtitle(OTP_LENGTH)}</Text>
         <View style={styles.numberRow}>
-          <Text style={styles.phone}>{content.formatPhone(phone)}</Text>
+          <Text style={styles.phone}>
+            {isE164Phone ? e164PhoneNumber : content.formatPhone(phone)}
+          </Text>
           <Pressable accessibilityRole="button" onPress={changeNumber} style={styles.textButton}>
             <Text style={styles.link}>{content.changeNumber}</Text>
           </Pressable>
