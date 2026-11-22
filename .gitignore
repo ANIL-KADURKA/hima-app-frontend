@@ -33,6 +33,10 @@ pnpm-debug.log*
 .env.*
 !.env.example
 
+# Firebase app configuration
+/google-services.json
+/GoogleService-Info.plist
+
 # typescript
 *.tsbuildinfo
 
