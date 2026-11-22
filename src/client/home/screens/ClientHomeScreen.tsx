@@ -1,13 +1,44 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { Redirect, useRouter } from 'expo-router';
+
 import { clientHomeContent as content } from '@/client/content/home';
 import { brandContent } from '@/shared/content/common';
 import { HimaMark } from '@/shared/components/HimaMark';
 import { Screen } from '@/shared/components/Screen';
 import { colors, radius, spacing, typography } from '@/shared/theme';
+import { useAuthSession } from '@/auth/hooks/useAuthSession';
+import { APP_ROUTES } from '@/routes';
+import { LoadingIndicator } from '@/shared/components/LoadingIndicator';
+import { Button } from '@/shared/components/Button';
+import { useLogoutMutation } from '@/auth/hooks/useLogoutMutation';
+import { getAuthErrorMessage } from '@/auth/utils/authErrorMessage';
 
 export function ClientHomeScreen() {
+  const router = useRouter();
+  const { data: session, isPending } = useAuthSession();
+  const logout = useLogoutMutation();
+  if (isPending) return <LoadingIndicator />;
+  if (!session) return <Redirect href={APP_ROUTES.register} />;
+
   return (
     <Screen>
+      <View style={styles.header}>
+        <Button
+          label={logout.isPending ? content.loggingOut : content.logout}
+          disabled={logout.isPending}
+          onPress={() =>
+            logout.mutate(session, {
+              onSuccess: () => router.replace(APP_ROUTES.register),
+            })
+          }
+          style={styles.logout}
+        />
+      </View>
+      {logout.error && (
+        <Text accessibilityRole="alert" style={styles.logoutError}>
+          {getAuthErrorMessage(logout.error)}
+        </Text>
+      )}
       <View style={styles.content}>
         <View style={styles.logo}>
           <HimaMark size={56} />
@@ -26,6 +57,24 @@ export function ClientHomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: spacing.sm,
+  },
+  logout: {
+    minHeight: 44,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+  },
+  logoutError: {
+    ...typography.label,
+    color: colors.error,
+    textAlign: 'right',
+    width: '100%',
+    marginBottom: spacing.sm,
+  },
   content: {
     width: '100%',
     maxWidth: 440,
