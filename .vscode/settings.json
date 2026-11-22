@@ -3,5 +3,9 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": { "source.fixAll.eslint": "explicit" },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "files.exclude": { "**/.expo": true, "**/node_modules": true }
+  "files.exclude": {
+    "**/.expo": true,
+    "**/node_modules": true
+  },
+  "files.autoSave": "afterDelay"
 }
