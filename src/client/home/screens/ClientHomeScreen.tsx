@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Redirect, useRouter } from 'expo-router';
 
@@ -15,6 +16,7 @@ import { getAuthErrorMessage } from '@/auth/utils/authErrorMessage';
 
 export function ClientHomeScreen() {
   const router = useRouter();
+  const logoutInFlight = useRef(false);
   const { data: session, isPending } = useAuthSession();
   const logout = useLogoutMutation();
   if (isPending) return <LoadingIndicator />;
@@ -26,11 +28,16 @@ export function ClientHomeScreen() {
         <Button
           label={logout.isPending ? content.loggingOut : content.logout}
           disabled={logout.isPending}
-          onPress={() =>
+          onPress={() => {
+            if (logoutInFlight.current) return;
+            logoutInFlight.current = true;
             logout.mutate(session, {
               onSuccess: () => router.replace(APP_ROUTES.register),
-            })
-          }
+              onSettled: () => {
+                logoutInFlight.current = false;
+              },
+            });
+          }}
           style={styles.logout}
         />
       </View>
