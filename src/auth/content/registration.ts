@@ -7,6 +7,8 @@ export const registrationContent = {
   phoneLabel: i18n.t('auth.registration.phoneLabel'),
   phonePlaceholder: i18n.t('auth.registration.phonePlaceholder'),
   phoneHelper: i18n.t('auth.registration.phoneHelper'),
+  phoneHintInvalid: i18n.t('auth.registration.phoneHintInvalid'),
+  consentRequired: i18n.t('auth.registration.consentRequired'),
   referralToggle: i18n.t('auth.registration.referralToggle'),
   referralLabel: i18n.t('auth.registration.referralLabel'),
   referralPlaceholder: i18n.t('auth.registration.referralPlaceholder'),

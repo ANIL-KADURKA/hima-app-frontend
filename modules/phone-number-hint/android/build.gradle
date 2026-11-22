@@ -1,0 +1,19 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'com.hima.phonenumberhint'
+version = '1.0.0'
+
+expoModule {
+  v2 true
+}
+
+android {
+  namespace 'com.hima.phonenumberhint'
+}
+
+dependencies {
+  implementation 'com.google.android.gms:play-services-auth:21.5.0'
+}
